@@ -1,7 +1,27 @@
 package codejam2020.qualification
 
-operator fun IntRange.times(target: IntRange): Boolean =
-    (this.start < target.endInclusive) && (this.endInclusive > target.start)
+fun findOption(activities: Array<IntRange>, timelineC: MutableSet<Int>, timelineJ: MutableSet<Int>, assignment: CharArray): Boolean {
+    val index = assignment.indexOf(' ')
+    if (index < 0) return true
+
+    if (!activities[index].any { timelineC.contains(it) }) {
+        timelineC.addAll(activities[index])
+        assignment[index] = 'C'
+        if (findOption(activities, timelineC, timelineJ, assignment)) return true
+        assignment[index] = ' '
+        timelineC.removeAll(activities[index])
+    }
+
+    if (!activities[index].any { timelineJ.contains(it) }) {
+        timelineJ.addAll(activities[index])
+        assignment[index] = 'J'
+        if (findOption(activities, timelineC, timelineJ, assignment)) return true
+        assignment[index] = ' '
+        timelineJ.removeAll(activities[index])
+    }
+
+    return false
+}
 
 fun main() {
     val inputFileName = "src/codejam2020/qualification/ParentingPartneringReturns.in"
@@ -9,40 +29,14 @@ fun main() {
 
     for (case in 1..readLine()!!.toInt()) {
         val activities = Array(readLine()!!.toInt()) {
-            readLine()!!.split(' ').map { it.toInt() }.let { it[0]..it[1] }
+            readLine()!!.split(' ').map { it.toInt() }.let { it[0] until it[1] }
         }
 
-        val assignment = CharArray(activities.size) { 'C' }
-        var pos = 1
-        var proposed = 'C'
-
-        while (pos < activities.size) {
-            var target = activities
-                .filterIndexed { index, _ -> (index < pos) && (assignment[index] == proposed) }
-                .indexOfFirst { it * activities[pos] }
-
-            if ((target >= 0) && (proposed == 'C')) {
-                proposed = 'J'
-
-                target = activities
-                    .filterIndexed { index, _ -> (index < pos) && (assignment[index] == proposed) }
-                    .indexOfFirst { it * activities[pos] }
-            }
-
-            assignment[pos] = proposed
-
-            if (target < 0) {
-                pos++
-                proposed = 'C'
-            } else if (assignment[target] == 'C') {
-                pos = target
-                proposed = 'J'
-            } else {
-                pos = Int.MAX_VALUE // impossible
-            }
-        }
-
-        val result = if (pos > activities.size) "IMPOSSIBLE" else assignment.joinToString("")
+        val timelineC = mutableSetOf<Int>()
+        val timelineJ = mutableSetOf<Int>()
+        val assignment = CharArray(activities.size) { ' ' }
+        val exists = findOption(activities, timelineC, timelineJ, assignment)
+        val result = if (exists) assignment.joinToString("") else "IMPOSSIBLE"
         println("Case #$case: ${result}")
     }
 }
