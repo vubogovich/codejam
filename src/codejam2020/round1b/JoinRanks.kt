@@ -1,7 +1,8 @@
 package codejam2020.round1b
 
+// TODO
 fun main() {
-    val inputFileName = "src/codejam2020/round1b/P1.in"
+    val inputFileName = "src/codejam2020/round1b/JoinRanks.in"
     java.io.File(inputFileName).takeIf { it.exists() }?.also { System.setIn(it.inputStream()) }
 
     for (case in 1..readLine()!!.toInt()) {
