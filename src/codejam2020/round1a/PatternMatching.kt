@@ -8,8 +8,8 @@ fun main() {
     for (case in 1..readLine()!!.toInt()) {
         val patterns = Array(readLine()!!.toInt()) { readLine()!!.split('*').let { it[0] to it[1] } }
 
-        val left = patterns.map { it.first }.maxBy { it.length }!!
-        val right = patterns.map { it.second }.maxBy { it.length }!!
+        val left = patterns.map { it.first }.maxByOrNull { it.length }!!
+        val right = patterns.map { it.second }.maxByOrNull { it.length }!!
         val ok = patterns.all { left.startsWith(it.first) && right.endsWith(it.second) }
         val result = if (ok) left + right else "*"
 
